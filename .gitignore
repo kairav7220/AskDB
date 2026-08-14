@@ -1,5 +1,36 @@
+# Secrets / environment
 .env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Python
 .venv/
+venv/
 __pycache__/
-*.db
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
 *.ipynb
+
+# Databases and runtime data
+*.db
+*.sqlite
+*.sqlite3
+eval_history.json
+data_dump/
+
+# Local-only scripts (not part of the deployed app)
+create_db.py
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Temp files
+_test_repro.py

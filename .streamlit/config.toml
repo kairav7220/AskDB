@@ -1,0 +1,51 @@
+# SQLedger — light theme
+# Clean "paper + ink" palette with a teal accent.
+# No dark/indigo backgrounds.
+
+[theme]
+base = "light"
+primaryColor = "#0F766E"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F2F7F6"
+codeBackgroundColor = "#F2F7F6"
+textColor = "#1B2E2A"
+linkColor = "#0F766E"
+borderColor = "#D7E3E0"
+showWidgetBorder = true
+showSidebarBorder = false
+baseRadius = "12px"
+buttonRadius = "10px"
+
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Space Grotesk:https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+codeFontSize = "0.85rem"
+codeTextColor = "#1B2E2A"
+baseFontSize = 15
+baseFontWeight = 400
+headingFontSizes = ["30px", "24px", "20px", "17px", "15px", "13px"]
+headingFontWeights = [600, 600, 600, 600, 500, 500]
+linkUnderline = false
+
+chartCategoricalColors = ["#0F766E", "#E07B2E", "#1E8E9E", "#7C5CD6", "#D64545", "#5B8A2A", "#A06A1B"]
+
+blueColor = "#1E8E9E"
+greenColor = "#1E8E5A"
+redColor = "#D64545"
+yellowColor = "#D9A406"
+orangeColor = "#E07B2E"
+violetColor = "#7C5CD6"
+grayColor = "#5B6B67"
+
+dataframeBorderColor = "#D7E3E0"
+dataframeHeaderBackgroundColor = "#EDF4F2"
+
+[theme.sidebar]
+backgroundColor = "#F2F7F6"
+secondaryBackgroundColor = "#E7F0EE"
+codeBackgroundColor = "#E7F0EE"
+textColor = "#1B2E2A"
+borderColor = "#CFDDDA"
+primaryColor = "#0F766E"
+dataframeHeaderBackgroundColor = "#E7F0EE"
+dataframeBorderColor = "#CFDDDA"
