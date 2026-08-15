@@ -139,7 +139,7 @@ def init():
     ensure_database()
     db = SQLDatabase(get_engine(), sample_rows_in_table_info=3)
     primary = ChatGoogleGenerativeAI(model='gemini-flash-lite-latest', temperature=0.0)
-    fallback = ChatGroq(model='llama-3.3-70b-versatile', temperature=0.0)
+    fallback = ChatGroq(model='openai/gpt-oss-120b', temperature=0.0)
     llm = primary.with_fallbacks([fallback])
 
     sql_prompt = ChatPromptTemplate.from_template(SQL_TEMPLATE)
