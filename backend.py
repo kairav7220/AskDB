@@ -355,3 +355,8 @@ def load_eval_history():
         return []
     with open(EVAL_HISTORY_FILE) as f:
         return json.load(f)
+
+
+def clear_eval_history():
+    with open(EVAL_HISTORY_FILE, 'w') as f:
+        json.dump([], f)
