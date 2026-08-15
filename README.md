@@ -12,6 +12,7 @@
   <a href="#features">Features</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#pages">Pages</a> •
+  <a href="#standalone-scripts">Standalone Scripts</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#configuration">Configuration</a> •
   <a href="#evaluation">Evaluation</a> •
@@ -78,6 +79,36 @@ flowchart LR
 | **Evaluate** | Run a 5-question RAGAS benchmark, view per-question scores, and watch trends over time |
 | **Database** | Import a CSV as a new table, rebuild the six seeded tables, or delete only user-added tables |
 
+## Standalone Scripts
+
+These are the **original single-file versions** of the pipeline — the stepping stones that grew into the full AskDB app. No Streamlit UI, no auto-fix, no connection pool — just the core LCEL chain run from the command line.
+
+### 1.py — Minimal Gemini chain
+
+The very first prototype: a Gemini 2.5 Flash LCEL chain against a local SQLite database. It builds the SQL prompt, runs one question, and prints the generated SQL to stdout.
+
+```bash
+python 1.py
+```
+
+### 2.py — Groq chain + RAGAS evaluation
+
+The evaluation prototype: a Groq Llama 3.3 70B chain that generates SQL for the five benchmark questions, runs them against SQLite, and scores the answers with RAGAS (Context Precision + Helpfulness). This is the seed of today's **Evaluate** page.
+
+```bash
+python 2.py
+```
+
+### create_db.py — CSV → SQLite migration
+
+The original data pipeline: reads the CSVs in `Data_CSV/` and builds the local `text_to_sql.db` SQLite file. Today this is handled automatically by `backend.ensure_database()` inside the app.
+
+```bash
+python create_db.py
+```
+
+The full AskDB app (`frontend.py` + `backend.py`) is the evolved version — a Streamlit UI, live schema viewer, streaming chat, self-healing SQL, and the RAGAS evaluation dashboard.
+
 ## Quick Start
 
 ```bash
@@ -126,6 +157,13 @@ The Evaluate page pushes five fixed questions through the pipeline and scores th
 |---|---|
 | Context Precision | How relevant the retrieved schema context was (0–1) |
 | Helpfulness | Rubric-scored answer quality (1–5) |
+
+Sample RAGAS results on the five benchmark questions:
+
+| Metric | Score |
+|---|---|
+| Context Precision | 1.0000 |
+| Helpfulness (Rubrics) | 3.80 / 5.00 |
 
 ## Project Structure
 
