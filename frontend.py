@@ -490,6 +490,17 @@ if db_ok:
 else:
     st.badge(f"database unavailable", icon=":material/error:", color="red")
     st.error(f"Diagnostic — check_database() error: {db_error}")
+    try:
+        keys = list(st.secrets.keys())
+        has_google = 'GOOGLE_API_KEY' in keys
+        has_groq = 'GROQ_API_KEY' in keys
+        st.caption(
+            f"Diagnostic — top-level secret keys: {keys} | "
+            f"GOOGLE_API_KEY present: {has_google} | "
+            f"GROQ_API_KEY present: {has_groq}"
+        )
+    except Exception as exc:
+        st.caption(f"Diagnostic — could not read st.secrets: {exc}")
 
 # --------------------------------------------------------------------------
 # Sidebar (app info only)
