@@ -14,7 +14,6 @@
   <a href="#pages">Pages</a> •
   <a href="#standalone-scripts">Standalone Scripts</a> •
   <a href="#quick-start">Quick Start</a> •
-  <a href="#configuration">Configuration</a> •
   <a href="#evaluation">Evaluation</a> •
   <a href="#project-structure">Structure</a>
 </p>
@@ -131,23 +130,6 @@ streamlit run frontend.py
 ```
 
 Open `http://localhost:8501` — ask *"What was the budget of Product 12?"* in the chat and you get the SQL and the result.
-
-## Configuration
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `GOOGLE_API_KEY` | Yes | Primary Gemini LLM key |
-| `GROQ_API_KEY` | Optional | Failover Groq LLM key |
-
-On Streamlit Community Cloud, add these in **Settings > Secrets** as top-level TOML keys, plus the database connection:
-
-```toml
-GOOGLE_API_KEY = "AIza..."
-GROQ_API_KEY = "gsk_..."
-
-[connections.app_db]
-url = "postgresql://..."
-```
 
 ## Evaluation
 
