@@ -142,11 +142,20 @@ def reload_database():
     return db
 
 
+def _secret(name):
+    return (
+        os.getenv(name)
+        or (st.secrets.get(name) if isinstance(st.secrets.get(name), str) else None)
+        or (st.secrets.get('connections', {}).get(name) if isinstance(st.secrets.get('connections', {}).get(name), str) else None)
+        or None
+    )
+
+
 def init():
     ensure_database()
     db = SQLDatabase(get_engine(), sample_rows_in_table_info=3)
-    primary = ChatGoogleGenerativeAI(model='gemini-flash-lite-latest', temperature=0.0)
-    fallback = ChatGroq(model='openai/gpt-oss-120b', temperature=0.0)
+    primary = ChatGoogleGenerativeAI(model='gemini-flash-lite-latest', temperature=0.0, api_key=_secret('GOOGLE_API_KEY'))
+    fallback = ChatGroq(model='openai/gpt-oss-120b', temperature=0.0, api_key=_secret('GROQ_API_KEY'))
     llm = primary.with_fallbacks([fallback])
 
     sql_prompt = ChatPromptTemplate.from_template(SQL_TEMPLATE)
