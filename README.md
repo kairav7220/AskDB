@@ -128,7 +128,7 @@ Sample RAGAS results on the five benchmark questions:
 
 | Metric | Score |
 |---|---|
-| Context Precision | 1.000 / 1.0000 |
+| Context Precision | 1.0000 / 1.0000 |
 | Helpfulness (Rubrics) | 5.00 / 5.00 |
 
 ## Project Structure
