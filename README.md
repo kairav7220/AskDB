@@ -1,169 +1,152 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=Text-to-SQL%20Chatbot&fontSize=50&fontAlignY=35&desc=Natural%20Language%20%E2%86%92%20SQL%20%E2%86%92%20Answers&descAlignY=55" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=AskDB&fontSize=50&fontAlignY=35&desc=Natural%20Language%20%E2%86%92%20SQL%20%E2%86%92%20Answers&descAlignY=55" />
 </p>
 
 <p align="center">
-  <a href="https://text-to-sql-chatbot-main-qlt4z8jx8aewbafdybguyt.streamlit.app/" target="_blank">
+  <a href="https://askdb-text-to-sql.streamlit.app/" target="_blank">
     <img src="https://img.shields.io/badge/Live_Demo-Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Live Demo"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> ·
-  <a href="#architecture">Architecture</a> ·
-  <a href="#quick-start">Quick Start</a> ·
-  <a href="#usage">Usage</a> ·
-  <a href="#evaluation">Evaluation</a> ·
-  <a href="#project-structure">Structure</a> ·
-  <a href="#comparison">Comparison</a> ·
-  <a href="#contributing">Contributing</a>
+  <a href="#features">Features</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#pages">Pages</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#evaluation">Evaluation</a> •
+  <a href="#project-structure">Structure</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white" alt="Python 3.11"/>
-  <img src="https://img.shields.io/badge/LangChain-LCEL-important?logo=langchain" alt="LangChain"/>
-  <img src="https://img.shields.io/badge/Gemini-2.5%20Flash-yellow" alt="Gemini 2.5 Flash"/>
-  <img src="https://img.shields.io/badge/HuggingFace-all--MiniLM--L6--v2-orange?logo=huggingface" alt="all-MiniLM-L6-v2"/>
-  <img src="https://img.shields.io/badge/Groq-llama--3.3--70b-orange" alt="Groq"/>
   <img src="https://img.shields.io/badge/Streamlit-UI-red?logo=streamlit&logoColor=white" alt="Streamlit"/>
+  <img src="https://img.shields.io/badge/LangChain-LCEL-important?logo=langchain" alt="LangChain"/>
+  <img src="https://img.shields.io/badge/Gemini-Primary%20LLM-yellow" alt="Gemini"/>
+  <img src="https://img.shields.io/badge/Groq-Fallback-blue" alt="Groq"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-Neon-336791?logo=postgresql&logoColor=white" alt="PostgreSQL"/>
   <img src="https://img.shields.io/badge/RAGAS-Evaluation-success" alt="RAGAS"/>
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"/>
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"/>
 </p>
 
 ---
 
+Ask a sales question in plain English. AskDB turns it into a SQL query, runs it against the database, and hands back an answer with the rows.
+
 ## Features
 
-- **Natural Language → SQL** — Ask in plain English, get SQL queries + query results
-- **LCEL Chain** — LangChain expression language pipeline (schema → prompt → LLM → parser)
-- **Multi-LLM Support** — Groq (Llama 3.3 70B) + Google Gemini (2.0/2.5 Flash)
-- **RAGAS Evaluation** — Built-in quality scoring (Context Precision, Helpfulness Rubrics)
-- **Streamlit UI** — Chat interface with live schema viewer and evaluation dashboard
-- **CSV → SQLite Pipeline** — Zero-config database setup from CSV files
+- **Natural Language → SQL** — ask in plain English, get a streamed SQL query plus the result rows
+- **Dual-LLM Failover** — Gemini as primary with an automatic Groq fallback on failure
+- **Self-Healing SQL** — failed queries are auto-corrected against the schema (up to 3 retries)
+- **Read-Only Guard** — every query is validated to be `SELECT`/`WITH` before it runs
+- **RAGAS Evaluation** — one-click benchmark scoring (Context Precision + Helpfulness rubric)
+- **Live Schema Viewer** — inspect every table, its columns, and row counts without touching the data
+- **CSV → Database** — seed the database from CSVs, import new tables, or rebuild from source
+- **Score History** — every benchmark run is saved, charted as trends, and clearable with one click
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  User["🙋 User Question"] --> UI["Streamlit UI"]
-  UI --> Chain["LCEL Chain<br/>(Schema → Prompt → LLM → Parser)"]
-  Chain --> LLM["Groq Llama 3.3<br/>or Gemini 2.5 Flash"]
-  LLM --> DB[("SQLite Database")]
-  
-  DB --> Results["Query Results"]
+  User["🧑 User"] --> UI["🖥️ Streamlit Frontend<br/>(frontend.py — 4 pages)"]
+  UI -->|"run_query(question)"| Backend["⚙️ Backend<br/>(backend.py — LCEL)"]
+  Backend --> Prompt["📝 SQL Prompt<br/>(schema + history)"]
+  Prompt --> LLM{"🔀 LLM<br/>Gemini → Groq fallback"}
+  LLM --> Fix{"🛠 Auto-fix<br/>on error, ≤3 retries"}
+  Fix --> DB[("🗄 Database<br/>st.connection (SQLite / Neon)")]
+  DB --> Results["📊 Result rows"]
   Results --> UI
-  
-  UI --> Eval["RAGAS Evaluator<br/>(Context Precision + Helpfulness)"]
-  Eval --> Dashboard["Evaluation Dashboard"]
+  UI -->|"evaluate_ragas()"| Eval["📏 RAGAS<br/>(Context Precision + Helpfulness)"]
+  Eval --> History["📈 eval_history.json<br/>scores + trend charts"]
 ```
 
-| Component | Stack |
+| Layer | Technology |
 |---|---|
-| **Frontend** | Streamlit (chat + eval tabs) |
-| **Orchestration** | LangChain LCEL (RunnablePassthrough → Prompt → LLM → StrOutputParser) |
-| **LLM** | Groq `llama-3.3-70b-versatile`, Gemini `2.0-flash` / `2.5-flash` |
-| **Database** | SQLite (auto-seeded from CSVs) |
+| **Frontend** | Streamlit (custom theme, chat + eval dashboard) |
+| **Orchestration** | LangChain LCEL (schema → prompt → LLM → parser) |
+| **LLM** | Gemini `gemini-flash-lite-latest` primary, Groq `openai/gpt-oss-120b` fallback |
+| **Database** | `st.connection('app_db')` — SQLite locally, Neon Postgres on the cloud |
 | **Evaluation** | RAGAS (Context Precision, Rubrics-based Helpfulness) |
 | **Embeddings** | `sentence-transformers/all-MiniLM-L6-v2` |
+
+## Pages
+
+| Page | What it does |
+|---|---|
+| **Ask the data** | Chat with the database — question in, SQL + answer + rows out, with a bounded auto-scrolling panel |
+| **Schema** | Browse tables, columns, types, keys, and row counts (metadata only, no row data) |
+| **Evaluate** | Run a 5-question RAGAS benchmark, view per-question scores, and watch trends over time |
+| **Database** | Import a CSV as a new table, rebuild the six seeded tables, or delete only user-added tables |
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/kairav7220/Text-to-SQL-Chatbot-main.git
-cd Text-to-SQL-Chatbot-main
+git clone https://github.com/kairav7220/AskDB.git
+cd AskDB
+python -m venv .venv
+.venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 ```
 
-Set your API keys in `.env`:
+Copy `.env.example` to `.env` and fill in your keys (see [Configuration](#configuration)):
 
 ```env
-GROQ_API_KEY="gsk_..."
 GOOGLE_API_KEY="AIza..."
+GROQ_API_KEY="gsk_..."
 ```
-
-Run the app:
 
 ```bash
-streamlit run app.py
+streamlit run frontend.py
 ```
 
-Ask "What was the budget of Product 12?" in the chat — you get the SQL and the result.
+Open `http://localhost:8501` — ask *"What was the budget of Product 12?"* in the chat and you get the SQL and the result.
 
-## Usage
+## Configuration
 
-### Streamlit App
+| Variable | Required | Purpose |
+|---|---|---|
+| `GOOGLE_API_KEY` | Yes | Primary Gemini LLM key |
+| `GROQ_API_KEY` | Optional | Failover Groq LLM key |
 
-```bash
-streamlit run app.py
-```
+On Streamlit Community Cloud, add these in **Settings > Secrets** as top-level TOML keys, plus the database connection:
 
-Two tabs:
-- **Chat** — conversational interface, shows SQL + result per message
-- **Evaluate** — runs 5 benchmark queries, scores via RAGAS metrics
+```toml
+GOOGLE_API_KEY = "AIza..."
+GROQ_API_KEY = "gsk_..."
 
-### Script Mode
-
-```bash
-python 1.py   # Gemini LCEL chain (query "Geiss Company line total")
-python 2.py   # Groq chain + RAGAS evaluation on 5 questions
-```
-
-### CSV → Database
-
-```bash
-python create_db.py
-```
-
-Auto-loads CSVs from `Data_CSV/` into a local SQLite database.
-
-## When to Use
-
-| Do | Don't |
-|---|---|
-| Ad-hoc analytics on structured data | Complex multi-database joins |
-| Prototyping NL-to-SQL for your domain | Production workloads (no auth, rate-limiting) |
-| Learning LangChain patterns | Real-time streaming queries |
-| Benchmarking LLM SQL generation accuracy | Sensitive data (API keys in `.env`, no encryption) |
-
-## Comparison
-
-| Feature | This Project | LangChain SQL Agent | SQLAlchemy + Hand-coded |
-|---|---|---|---|
-| UI | ✅ Streamlit | ❌ CLI only | ❌ |
-| RAGAS Evaluation | ✅ Built-in | ❌ | ❌ |
-| LCEL Pipeline | ✅ Runnable chain | ✅ | ❌ |
-| Multi-LLM | ✅ Groq + Gemini | ✅ | ❌ |
-| CSV → DB Seeding | ✅ Auto | ❌ | ❌ |
-
-## Project Structure
-
-```
-Text-to-SQL-Chatbot-main/
-├── app.py                  # Streamlit app (chat + eval)
-├── 1.py                    # Gemini LCEL chain (minimal)
-├── 2.py                    # Groq chain + RAGAS script
-├── create_db.py            # CSV → SQLite migration
-├── Data_CSV/               # Source CSV files (7 tables)
-├── data_dump/              # Additional CSV exports
-├── requirements.txt        # Python dependencies
-├── CONTRIBUTING.md         # Contribution guide
-├── llms.txt                # AI assistant context
-├── .gitignore
-└── LICENSE                 # MIT
+[connections.app_db]
+url = "postgresql://..."
 ```
 
 ## Evaluation
 
-Sample RAGAS results (Groq Llama 3.3 70B on 5 benchmark queries):
+The Evaluate page pushes five fixed questions through the pipeline and scores them with RAGAS — **Context Precision** (retrieval relevance) and a **1–5 Helpfulness rubric**. Each run is appended to `eval_history.json`, so scores can be tracked across runs with trend charts. Use **Clear history** (beside the Score history heading) to wipe all recorded runs.
 
-| Metric | Score |
+| Metric | Description |
 |---|---|
-| Context Precision | 1.0000 |
-| Helpfulness (Rubrics) | 3.80 / 5.00 |
+| Context Precision | How relevant the retrieved schema context was (0–1) |
+| Helpfulness | Rubric-scored answer quality (1–5) |
 
-## Contributing
+## Project Structure
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
+```
+AskDB/
+├── README.md                      # Project documentation
+├── frontend.py                    # Streamlit app — all four pages + chat
+├── backend.py                     # LCEL chains, SQL gen/fix/exec, RAGAS eval
+├── vertexai_shim.py               # ragas import shim — do not remove
+├── 1.py                           # Minimal Gemini LCEL chain (standalone)
+├── 2.py                           # Groq chain + RAGAS evaluation (standalone)
+├── requirements.txt               # Python dependencies
+├── .env.example                   # Required API keys template
+├── .streamlit/
+│   ├── config.toml                # Theme (SQLedger light palette)
+│   └── secrets.toml               # Local DB URL (gitignored)
+├── static/
+│   ├── user_avatar.svg            # Chat avatar
+│   └── bot_avatar.svg             # Chat avatar
+└── Data_CSV/                      # Source CSVs (six seeded tables)
+```
 
 ## License
 
@@ -172,8 +155,10 @@ MIT © [kairav7220](https://github.com/kairav7220)
 ---
 
 <p align="center">
-  Built with <a href="https://python.langchain.com">LangChain</a> ·
-  <a href="https://groq.com">Groq</a> ·
-  <a href="https://ai.google.dev/gemini-api">Gemini</a> ·
+  Built with <a href="https://streamlit.io">Streamlit</a> •
+  <a href="https://python.langchain.com">LangChain</a> •
+  <a href="https://ai.google.dev/gemini-api">Gemini</a> •
+  <a href="https://groq.com">Groq</a> •
+  <a href="https://neon.tech">Neon</a> •
   <a href="https://docs.ragas.io">RAGAS</a>
 </p>
