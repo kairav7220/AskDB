@@ -371,11 +371,11 @@ def render_evaluate_page():
                 },
             )
 
-    hist_head, hist_clear = st.columns([3, 1])
+    hist_head, hist_clear = st.columns([10, 2], vertical_alignment="center")
     with hist_head:
         st.markdown("#### Score history")
     with hist_clear:
-        if st.button("Clear history", icon=":material/delete_sweep:"):
+        if st.button("Clear history", icon=":material/delete_sweep:", key="clear_history"):
             get_backend().clear_eval_history()
             st.session_state.bench_df = None
             st.rerun()
