@@ -23,13 +23,6 @@ from ragas.metrics import RubricsScore, ContextPrecision
 from ragas.dataset_schema import SingleTurnSample, EvaluationDataset
 load_dotenv()
 
-try:
-    for _k, _v in dict(st.secrets).items():
-        if isinstance(_v, (str, int, float)):
-            os.environ.setdefault(_k, str(_v))
-except Exception:
-    pass
-
 CSV_TABLES = {
     'Data_CSV/Customers.csv': 'Customers',
     'Data_CSV/Sales_order.csv': 'sales_order',
@@ -142,20 +135,11 @@ def reload_database():
     return db
 
 
-def _secret(name):
-    return (
-        os.getenv(name)
-        or (st.secrets.get(name) if isinstance(st.secrets.get(name), str) else None)
-        or (st.secrets.get('connections', {}).get(name) if isinstance(st.secrets.get('connections', {}).get(name), str) else None)
-        or None
-    )
-
-
 def init():
     ensure_database()
     db = SQLDatabase(get_engine(), sample_rows_in_table_info=3)
-    primary = ChatGoogleGenerativeAI(model='gemini-flash-lite-latest', temperature=0.0, api_key=_secret('GOOGLE_API_KEY'))
-    fallback = ChatGroq(model='openai/gpt-oss-120b', temperature=0.0, api_key=_secret('GROQ_API_KEY'))
+    primary = ChatGoogleGenerativeAI(model='gemini-flash-lite-latest', temperature=0.0)
+    fallback = ChatGroq(model='openai/gpt-oss-120b', temperature=0.0)
     llm = primary.with_fallbacks([fallback])
 
     sql_prompt = ChatPromptTemplate.from_template(SQL_TEMPLATE)
