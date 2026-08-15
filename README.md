@@ -80,29 +80,13 @@ flowchart LR
 
 ## Standalone Scripts
 
-These are the **original single-file versions** of the pipeline — the stepping stones that grew into the full AskDB app. No Streamlit UI, no auto-fix, no connection pool — just the core LCEL chain run from the command line.
+`1.py`, `2.py`, and `create_db.py` are the **original single-file versions** of the pipeline — the stepping stones that grew into the full AskDB app. `1.py` runs a minimal Gemini 2.5 Flash LCEL chain against a local SQLite database and prints the generated SQL to stdout. `2.py` extends the same chain to Groq Llama 3.3 70B, runs the five benchmark questions, and scores them with RAGAS (Context Precision + Helpfulness) — the seed of today's **Evaluate** page. `create_db.py` reads the CSVs in `Data_CSV/` and builds the local `text_to_sql.db` SQLite file.
 
-### 1.py — Minimal Gemini chain
-
-The very first prototype: a Gemini 2.5 Flash LCEL chain against a local SQLite database. It builds the SQL prompt, runs one question, and prints the generated SQL to stdout.
+Use them as a reference for the pipeline logic, or run them standalone:
 
 ```bash
 python 1.py
-```
-
-### 2.py — Groq chain + RAGAS evaluation
-
-The evaluation prototype: a Groq Llama 3.3 70B chain that generates SQL for the five benchmark questions, runs them against SQLite, and scores the answers with RAGAS (Context Precision + Helpfulness). This is the seed of today's **Evaluate** page.
-
-```bash
 python 2.py
-```
-
-### create_db.py — CSV → SQLite migration
-
-The original data pipeline: reads the CSVs in `Data_CSV/` and builds the local `text_to_sql.db` SQLite file. Today this is handled automatically by `backend.ensure_database()` inside the app.
-
-```bash
 python create_db.py
 ```
 
