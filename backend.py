@@ -23,6 +23,13 @@ from ragas.metrics import RubricsScore, ContextPrecision
 from ragas.dataset_schema import SingleTurnSample, EvaluationDataset
 load_dotenv()
 
+try:
+    for _k, _v in dict(st.secrets).items():
+        if isinstance(_v, (str, int, float)):
+            os.environ.setdefault(_k, str(_v))
+except Exception:
+    pass
+
 CSV_TABLES = {
     'Data_CSV/Customers.csv': 'Customers',
     'Data_CSV/Sales_order.csv': 'sales_order',
