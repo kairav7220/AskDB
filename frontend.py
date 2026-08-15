@@ -274,30 +274,23 @@ def render_evaluate_page():
         "Each run is saved so you can watch scores change over time. Uses live "
         "LLM calls; allow a couple of minutes."
     )
-    col_run, col_clear = st.columns(2)
-    with col_run:
-        if st.button("Run benchmark", type="primary", icon=":material/speed:"):
-            with st.status("Running benchmark…", expanded=True) as status:
-                try:
-                    status.update(
-                        label="Generating SQL for 5 questions, then scoring with RAGAS…"
-                    )
-                    result = get_backend().evaluate_ragas()
-                    bench_df = result.to_pandas()
-                    status.update(label="Benchmark complete", state="complete", expanded=False)
-                except Exception as exc:
-                    status.update(label="Benchmark failed", state="error")
-                    st.error(f"Benchmark error: {exc}")
-                    st.stop()
-            backend = get_backend()
-            backend.save_eval_run(bench_df)
-            st.session_state.bench_df = bench_df
-            st.rerun()
-    with col_clear:
-        if st.button("Clear history", icon=":material/delete_sweep:"):
-            get_backend().clear_eval_history()
-            st.session_state.bench_df = None
-            st.rerun()
+    if st.button("Run benchmark", type="primary", icon=":material/speed:"):
+        with st.status("Running benchmark…", expanded=True) as status:
+            try:
+                status.update(
+                    label="Generating SQL for 5 questions, then scoring with RAGAS…"
+                )
+                result = get_backend().evaluate_ragas()
+                bench_df = result.to_pandas()
+                status.update(label="Benchmark complete", state="complete", expanded=False)
+            except Exception as exc:
+                status.update(label="Benchmark failed", state="error")
+                st.error(f"Benchmark error: {exc}")
+                st.stop()
+        backend = get_backend()
+        backend.save_eval_run(bench_df)
+        st.session_state.bench_df = bench_df
+        st.rerun()
 
     if st.session_state.bench_df is not None:
         df = st.session_state.bench_df
@@ -378,7 +371,14 @@ def render_evaluate_page():
                 },
             )
 
-    st.markdown("#### Score history")
+    hist_head, hist_clear = st.columns([3, 1])
+    with hist_head:
+        st.markdown("#### Score history")
+    with hist_clear:
+        if st.button("Clear history", icon=":material/delete_sweep:"):
+            get_backend().clear_eval_history()
+            st.session_state.bench_df = None
+            st.rerun()
     st.caption(
         "Every run is recorded here, newest last. Scores are per-run averages "
         "of the five benchmark questions. Trends draw after the second run."
