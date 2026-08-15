@@ -30,5 +30,3 @@ def install():
 
 
 install()
-
-# now in the database tab tehre are many errors that first the user-added table which is added by users appears to be very small which is hard to read and its in pill which is more hard to read make it something that it can be read make it bigger and dont make its chip or pill like and make the delete button proper functionable for user-added table only
