@@ -36,9 +36,9 @@ def get_backend():
 
 def check_database():
     try:
-        return True, get_backend().list_tables()
-    except Exception:
-        return False, []
+        return True, get_backend().list_tables(), None
+    except Exception as exc:
+        return False, [], str(exc)
 
 
 # --------------------------------------------------------------------------
@@ -246,7 +246,7 @@ def render_ask_page():
 def render_schema_page():
     backend = get_backend()
 
-    db_ok_t, db_tables_t = check_database()
+    db_ok_t, db_tables_t, _ = check_database()
     tables = db_tables_t if db_ok_t else []
     if not tables:
         st.warning(
@@ -480,7 +480,7 @@ st.caption(
     "the database, and hands back an answer with the rows."
 )
 
-db_ok, db_tables = check_database()
+db_ok, db_tables, db_error = check_database()
 if db_ok:
     st.badge(
         f"{len(db_tables)} tables",
@@ -488,7 +488,8 @@ if db_ok:
         color="green",
     )
 else:
-    st.badge("database unavailable", icon=":material/error:", color="red")
+    st.badge(f"database unavailable", icon=":material/error:", color="red")
+    st.error(f"Diagnostic — check_database() error: {db_error}")
 
 # --------------------------------------------------------------------------
 # Sidebar (app info only)
