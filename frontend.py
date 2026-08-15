@@ -41,6 +41,20 @@ def check_database():
         return False, [], str(exc)
 
 
+def _secret_keys():
+    try:
+        def names(d, prefix=""):
+            out = []
+            for k, v in d.items():
+                out.append(f"{prefix}{k}")
+                if isinstance(v, dict):
+                    out += names(v, prefix + k + ".")
+            return out
+        return names(dict(st.secrets))
+    except Exception:
+        return ["<none>"]
+
+
 # --------------------------------------------------------------------------
 # Session state
 # --------------------------------------------------------------------------
@@ -490,6 +504,7 @@ if db_ok:
 else:
     st.badge(f"database unavailable", icon=":material/error:", color="red")
     st.error(f"DB error: {db_err}")
+    st.caption("secret keys: " + ", ".join(_secret_keys()))
 
 # --------------------------------------------------------------------------
 # Sidebar (app info only)

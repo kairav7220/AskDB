@@ -137,9 +137,17 @@ def reload_database():
 
 def _secret(name):
     try:
-        return os.getenv(name) or os.getenv(name.lower()) or st.secrets.get(name) or None
+        top = st.secrets.get(name)
+        if top:
+            return top
+        for section in st.secrets.values():
+            if isinstance(section, dict):
+                v = section.get(name)
+                if v:
+                    return v
     except Exception:
-        return os.getenv(name) or os.getenv(name.lower()) or None
+        pass
+    return os.getenv(name) or os.getenv(name.lower()) or None
 
 
 def init():
