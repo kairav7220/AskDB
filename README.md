@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=AskDB&fontSize=50&fontAlignY=35&desc=Natural%20Language%20%E2%86%92%20SQL%20%E2%86%92%20Answers&descAlignY=55" />
+  <a href="https://askdb-text-to-sql.streamlit.app/" target="_blank">
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=AskDB&fontSize=50&fontAlignY=35&desc=Natural%20Language%20%E2%86%92%20SQL%20%E2%86%92%20Answers&descAlignY=55" />
+  </a>
 </p>
 
 <p align="center">
@@ -14,6 +16,7 @@
   <a href="#pages">Pages</a> •
   <a href="#standalone-scripts">Standalone Scripts</a> •
   <a href="#quick-start">Quick Start</a> •
+  <a href="#deployment">Deployment</a> •
   <a href="#evaluation">Evaluation</a> •
   <a href="#project-structure">Structure</a>
 </p>
@@ -114,6 +117,18 @@ streamlit run frontend.py
 ```
 
 Open `http://localhost:8501` — ask *"What was the budget of Product 12?"* in the chat and you get the SQL and the result.
+
+## Deployment
+
+On Streamlit Community Cloud, add your keys in **Settings > Secrets**. Order matters — top-level keys must come **before** the database section, because in TOML a `[section]` header takes ownership of everything below it until the next header:
+
+```toml
+GOOGLE_API_KEY = "AIza..."
+GROQ_API_KEY = "gsk_..."
+
+[connections.app_db]
+url = "postgresql://..."
+```
 
 ## Evaluation
 
