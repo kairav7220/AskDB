@@ -371,7 +371,7 @@ def render_evaluate_page():
                 },
             )
 
-    hist_head, hist_clear = st.columns([15, 2], vertical_alignment="center")
+    hist_head, hist_clear = st.columns([11, 2], vertical_alignment="center")
     with hist_head:
         st.markdown("#### Score history")
     with hist_clear:
