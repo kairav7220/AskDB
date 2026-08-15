@@ -36,23 +36,9 @@ def get_backend():
 
 def check_database():
     try:
-        return True, get_backend().list_tables(), None
-    except Exception as exc:
-        return False, [], str(exc)
-
-
-def _secret_keys():
-    try:
-        def names(d, prefix=""):
-            out = []
-            for k, v in d.items():
-                out.append(f"{prefix}{k}")
-                if isinstance(v, dict):
-                    out += names(v, prefix + k + ".")
-            return out
-        return names(dict(st.secrets))
+        return True, get_backend().list_tables()
     except Exception:
-        return ["<none>"]
+        return False, []
 
 
 # --------------------------------------------------------------------------
@@ -260,11 +246,11 @@ def render_ask_page():
 def render_schema_page():
     backend = get_backend()
 
-    db_ok_t, db_tables_t, db_err_t = check_database()
+    db_ok_t, db_tables_t = check_database()
     tables = db_tables_t if db_ok_t else []
     if not tables:
         st.warning(
-            f"No tables found — the database is unavailable. ({db_err_t})",
+            "No tables found — the database is unavailable.",
             icon=":material/database_off:",
         )
     else:
@@ -494,7 +480,7 @@ st.caption(
     "the database, and hands back an answer with the rows."
 )
 
-db_ok, db_tables, db_err = check_database()
+db_ok, db_tables = check_database()
 if db_ok:
     st.badge(
         f"{len(db_tables)} tables",
@@ -502,9 +488,7 @@ if db_ok:
         color="green",
     )
 else:
-    st.badge(f"database unavailable", icon=":material/error:", color="red")
-    st.error(f"DB error: {db_err}")
-    st.caption("secret keys: " + ", ".join(_secret_keys()))
+    st.badge("database unavailable", icon=":material/error:", color="red")
 
 # --------------------------------------------------------------------------
 # Sidebar (app info only)
